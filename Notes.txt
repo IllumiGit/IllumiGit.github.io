@@ -1,0 +1,5 @@
+To merge mutliple excel files into one:
+
+Run cmd.
+Navigate to destination folder.
+Run this "for %a in (*.csv) do type "%a" >> Compiled_Company_Information"
