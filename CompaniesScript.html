@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>SAS</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/excellentexport@3.4.3/dist/excellentexport.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<style>
+		table, th, td {
+	  	border: 1px solid black;
+	  	border-collapse: collapse;
+		}
+	</style>
+</head>
+<body>
+	<h2>Singapore companies data preparation</h2>
+		<div class="container mt-5">
+			<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-3">
+					<input type="file" id="fileUpload" accept=".xls, .xlsx" /><br/>
+				</div>
+				<div class="col-md-2">
+					<button type="button" id="uploadExcel">Convert</button>
+				</div>
+				<table id="datatable">
+			    <tr>
+			        <td>Business Constitution Description</td>
+							<td>Primary SSIC Code</td>
+							<td>Primary SSIC Description</td>
+							<td>Primary User Described Activity</td>
+							<td>Secondary SSIC Code</td>
+							<td>Secondary SSIC Description</td>
+							<td>Secondary User Described Activity</td>
+							<td>Entity Status Description</td>
+							<td>UEN Issue Date</td>
+							<td>UEN</td>
+							<td>Registration Incorporation Date</td>
+							<td>Number Of Officers</td>
+							<td>Company Type Description</td>
+							<td>Entity Type Description</td>
+							<td>Entity Name</td>
+							<td>Former Entity Name</td>
+							<td>Number Of Charges</td>
+							<td>Paid Up Capital</td>
+							<td>Paid Up Capital Currency</td>
+							<td>Address Type</td>
+							<td>Building Name</td>
+							<td>Unit Number</td>
+							<td>Street Name</td>
+							<td>Block</td>
+							<td>Level Number</td>
+							<td>Postal Code</td>
+							<td>Latitude</td>
+							<td>Longitutde</td>
+							<td>Bank Account</td>
+			    </tr>
+			    <tr>
+							<td id="Business_Constitution_Description"></td>
+							<td id="Primary_SSIC_Code"></td>
+							<td id="Primary_SSIC_Description"></td>
+							<td id="Primary_User_Described_Activity"></td>
+							<td id="Secondary_SSIC_Code"></td>
+							<td id="Secondary_SSIC_Description"></td>
+							<td id="Secondary_User_Described_Activity"></td>
+							<td id="Entity_Status_Description"></td>
+							<td id="UEN_Issue_Date"></td>
+							<td id="UEN"></td>
+							<td id="Registration_Incorporation_Date"></td>
+							<td id="Number_Of_Officers"></td>
+							<td id="Company_Type_Description"></td>
+							<td id="Entity_Type_Description"></td>
+							<td id="Entity_Name"></td>
+							<td id="Former_Entity_Name"></td>
+							<td id="Number_Of_Charges"></td>
+							<td id="Paid_Up_Capital"></td>
+							<td id="Paid_Up_Capital_Currency"></td>
+							<td id="Address_Type"></td>
+							<td id="Building_Name"></td>
+							<td id="Unit_Number"></td>
+							<td id="Street_Name"></td>
+							<td id="Block"></td>
+							<td id="Level_Number"></td>
+							<td id="Postal_Code"></td>
+							<td id="Latitude"></td>
+							<td id="Longitutde"></td>
+							<td id="Bank_Account"></td>
+
+			    </tr>
+			<a download="FilteredCompanyData.xls" href="#" onclick="return ExcellentExport.excel(this, 'datatable', 'Filtered Company Data');">Export to Excel</a>
+			</table>
+				<div class="col-md-12">
+					<pre id="jsonData"></pre>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		let selectedFile;
+		console.log(window.XLSX);
+		document.getElementById('fileUpload').addEventListener("change", (event) => {
+			selectedFile = event.target.files[0];
+		})
+
+		document.getElementById('uploadExcel').addEventListener("click", () => {
+			if(selectedFile){
+				let fileReader = new FileReader();
+				fileReader.readAsBinaryString(selectedFile);
+				fileReader.onload = (event) => {
+					let data = event.target.result;
+					let workbook = XLSX.read(data, {type:"binary"});
+					console.log(workbook);
+
+					//Changed
+					var i;
+					var datatable = document.getElementById("datatable");
+
+					workbook.SheetNames.forEach(sheet => {
+						let rowObject = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet]);
+						console.log("Row object here: ", rowObject);
+						console.log(rowObject.length);
+
+						function BankAccGenerator(){
+							
+						}
+
+						for (i = 0; i < rowObject.length; i++) {
+							console.log("Row length: ", rowObject.length);
+							console.log("Row now: ", i);
+							if (i == 0) {
+								document.getElementById('Business_Constitution_Description').innerHTML = rowObject[i].business_constitution_description;
+								document.getElementById('Primary_SSIC_Code').innerHTML = rowObject[i].primary_ssic_code;
+								document.getElementById('Primary_SSIC_Description').innerHTML = rowObject[i].primary_ssic_description;
+								document.getElementById('Primary_User_Described_Activity').innerHTML = rowObject[i].primary_user_described_activity;
+								document.getElementById('Secondary_SSIC_Code').innerHTML = rowObject[i].secondary_ssic_code;
+								document.getElementById('Secondary_SSIC_Description').innerHTML = rowObject[i].secondary_ssic_description;
+								document.getElementById('Secondary_User_Described_Activity').innerHTML = rowObject[i].secondary_user_described_activity;
+								document.getElementById('Entity_Status_Description').innerHTML = rowObject[i].entity_status_description;
+								document.getElementById('UEN_Issue_Date').innerHTML = rowObject[i].uen_issue_date;
+								document.getElementById('UEN').innerHTML = rowObject[i].uen;
+								document.getElementById('Registration_Incorporation_Date').innerHTML = rowObject[i].registration_incorporation_date;
+								document.getElementById('Number_Of_Officers').innerHTML = rowObject[i].no_of_officers;
+								document.getElementById('Company_Type_Description').innerHTML = rowObject[i].company_type_description;
+								document.getElementById('Entity_Type_Description').innerHTML = rowObject[i].entity_type_description;
+								document.getElementById('Entity_Name').innerHTML = rowObject[i].entity_name;
+								document.getElementById('Former_Entity_Name').innerHTML = rowObject[i].former_entity_name1;
+								document.getElementById('Number_Of_Charges').innerHTML = rowObject[i].no_of_charges;
+								document.getElementById('Paid_Up_Capital').innerHTML = rowObject[i].paid_up_capital1_ordinary;
+								document.getElementById('Paid_Up_Capital_Currency').innerHTML = rowObject[i].paid_up_capital1_currency;
+								document.getElementById('Address_Type').innerHTML = rowObject[i].address_type;
+								document.getElementById('Building_Name').innerHTML = rowObject[i].building_name;
+								document.getElementById('Unit_Number').innerHTML = rowObject[i].unit_no;
+								document.getElementById('Street_Name').innerHTML = rowObject[i].street_name;
+								document.getElementById('Block').innerHTML = rowObject[i].block;
+								document.getElementById('Level_Number').innerHTML = rowObject[i].level_no;
+								document.getElementById('Postal_Code').innerHTML = rowObject[i].postal_code;
+								document.getElementById('Bank_Account').innerHTML = "0000000000";
+
+								console.log("End if loop");
+
+								console.log("Start retrieval");
+								var str1 = "https://developers.onemap.sg/commonapi/search?searchVal=";
+								// var str2 = rowObject[i].entity_name.toString();
+								var strBlock = rowObject[i].block.toString();
+								var strBlockSpaced = strBlock.concat(" ");
+								var strAddress = rowObject[i].street_name.toString();
+								var str2 = strBlockSpaced.concat(strAddress);
+								console.log("Address: ", str2);
+								var str2Replaced = str2.split(' ').join('%20');
+								var str3 = "&returnGeom=Y&getAddrDetails=Y";
+								var str12 = str1.concat(str2Replaced);
+								var comStr = str12.concat(str3);
+								console.log("String: ", comStr);
+								fetch(comStr.toString())
+								  .then((response) => {
+								    return response.json()
+								  })
+								  .then((data) => {
+								    // Work with JSON data here
+								    console.log(data);
+										if (data.results == null){
+											console.log("Geographic data is null");
+											document.getElementById('Latitude').innerHTML = "NA";
+											document.getElementById('Longitutde').innerHTML = "NA";
+										} else{
+											console.log("Geographic data is not null");
+											document.getElementById('Latitude').innerHTML = data.results[0].LATITUDE.toString();
+											document.getElementById('Longitutde').innerHTML = data.results[0].LONGITUDE.toString();
+									}
+								  })
+								  .catch((err) => {
+								    // Do something for an error here
+										console.log(err);
+								  })
+									console.log("End if retrieval here");
+							}
+							else {
+								console.log("Else loop");
+
+								var tr = document.createElement('tr');
+								// -- Not sure why adding this line works but removing it removes the excel data--//
+								// datatable.appendChild(tr);
+								// -- //
+								var td = document.createElement('td');
+								// document.getElementById('Business_Constitution_Description').innerHTML = rowObject[i].business_constitution_description;
+								td.appendChild(document.createTextNode(rowObject[i].business_constitution_description.toString()));
+								tr.appendChild(td);
+								console.log("business_constitution_description", td);
+
+								var td1 = document.createElement('td');
+								// document.getElementById('Primary_SSIC_Code').innerHTML = rowObject[i].primary_ssic_code;
+								td1.appendChild(document.createTextNode(rowObject[i].primary_ssic_code.toString()));
+								tr.appendChild(td1);
+								console.log("business_constitution_description", td1);
+
+								var td2 = document.createElement('td');
+								// document.getElementById('Primary_SSIC_Description').innerHTML = rowObject[i].primary_ssic_description;
+								td2.appendChild(document.createTextNode(rowObject[i].primary_ssic_description.toString()));
+								tr.appendChild(td2);
+
+								var td3 = document.createElement('td');
+								// document.getElementById('Primary_User_Described_Activity').innerHTML = rowObject[i].primary_user_described_activity;
+								td3.appendChild(document.createTextNode(rowObject[i].primary_user_described_activity.toString()));
+								tr.appendChild(td3);
+
+								var td4 = document.createElement('td');
+								// document.getElementById('Secondary_SSIC_Code').innerHTML = rowObject[i].secondary_ssic_code;
+								td4.appendChild(document.createTextNode(rowObject[i].secondary_ssic_code.toString()));
+								tr.appendChild(td4);
+
+								var td5 = document.createElement('td');
+								// document.getElementById('Secondary_SSIC_Description').innerHTML = rowObject[i].secondary_ssic_description;
+								td5.appendChild(document.createTextNode(rowObject[i].secondary_ssic_description.toString()));
+								tr.appendChild(td5);
+
+								var td6 = document.createElement('td');
+								// document.getElementById('Secondary_User_Described_Activity').innerHTML = rowObject[i].secondary_user_described_activity;
+								td6.appendChild(document.createTextNode(rowObject[i].secondary_user_described_activity.toString()));
+								tr.appendChild(td6);
+
+								var td7 = document.createElement('td');
+								// document.getElementById('Entity_Status_Description').innerHTML = rowObject[i].entity_status_description;
+								td7.appendChild(document.createTextNode(rowObject[i].entity_status_description.toString()));
+								tr.appendChild(td7);
+
+								var td8 = document.createElement('td');
+								// document.getElementById('UEN_Issue_Date').innerHTML = rowObject[i].uen_issue_date;
+								td8.appendChild(document.createTextNode(rowObject[i].uen_issue_date.toString()));
+								tr.appendChild(td8);
+
+								var td9 = document.createElement('td');
+								// document.getElementById('UEN').innerHTML = rowObject[i].uen;
+								td9.appendChild(document.createTextNode(rowObject[i].uen.toString()));
+								tr.appendChild(td9);
+
+								var td10 = document.createElement('td');
+								// document.getElementById('Registration_Incorporation_Date').innerHTML = rowObject[i].registration_incorporation_date;
+								td10.appendChild(document.createTextNode(rowObject[i].registration_incorporation_date.toString()));
+								tr.appendChild(td10);
+
+								var td11 = document.createElement('td');
+								// document.getElementById('Number_Of_Officers').innerHTML = rowObject[i].no_of_officers;
+								td11.appendChild(document.createTextNode(rowObject[i].no_of_officers.toString()));
+								tr.appendChild(td11);
+
+								var td12 = document.createElement('td');
+								// document.getElementById('Company_Type_Description').innerHTML = rowObject[i].company_type_description;
+								td12.appendChild(document.createTextNode(rowObject[i].company_type_description.toString()));
+								tr.appendChild(td12);
+
+								var td13 = document.createElement('td');
+								// document.getElementById('Entity_Type_Description').innerHTML = rowObject[i].entity_type_description;
+								td13.appendChild(document.createTextNode(rowObject[i].entity_type_description.toString()));
+								tr.appendChild(td13);
+
+								var td14 = document.createElement('td');
+								// document.getElementById('Entity_Name').innerHTML = rowObject[i].entity_name;
+								td14.appendChild(document.createTextNode(rowObject[i].entity_name.toString()));
+								tr.appendChild(td14);
+
+								var td15 = document.createElement('td');
+								// document.getElementById('Former_Entity_Name').innerHTML = rowObject[i].former_entity_name1;
+								td15.appendChild(document.createTextNode(rowObject[i].former_entity_name1.toString()));
+								tr.appendChild(td15);
+
+								var td16 = document.createElement('td');
+								// document.getElementById('Number_Of_Charges').innerHTML = rowObject[i].no_of_charges;
+								td16.appendChild(document.createTextNode(rowObject[i].no_of_charges.toString()));
+								tr.appendChild(td16);
+
+								var td17 = document.createElement('td');
+								// document.getElementById('Paid_Up_Capital').innerHTML = rowObject[i].paid_up_capital1_ordinary;
+								td17.appendChild(document.createTextNode(rowObject[i].paid_up_capital1_ordinary.toString()));
+								tr.appendChild(td17);
+
+								var td18 = document.createElement('td');
+								// document.getElementById('Paid_Up_Capital_Currency').innerHTML = rowObject[i].paid_up_capital1_currency;
+								td18.appendChild(document.createTextNode(rowObject[i].paid_up_capital1_currency.toString()));
+								tr.appendChild(td18);
+
+								var td19 = document.createElement('td');
+								// document.getElementById('Address_Type').innerHTML = rowObject[i].address_type;
+								td19.appendChild(document.createTextNode(rowObject[i].address_type.toString()));
+								tr.appendChild(td19);
+
+								var td20 = document.createElement('td');
+								// document.getElementById('Building_Name').innerHTML = rowObject[i].building_name;
+								td20.appendChild(document.createTextNode(rowObject[i].building_name.toString()));
+								tr.appendChild(td20);
+
+								var td21 = document.createElement('td');
+								// document.getElementById('Unit_Number').innerHTML = rowObject[i].unit_no;
+								td21.appendChild(document.createTextNode(rowObject[i].unit_no.toString()));
+								tr.appendChild(td21);
+
+								var td22 = document.createElement('td');
+								// document.getElementById('Street_Name').innerHTML = rowObject[i].street_name;
+								td22.appendChild(document.createTextNode(rowObject[i].street_name.toString()));
+								tr.appendChild(td22);
+
+								var td23 = document.createElement('td');
+								// document.getElementById('Block').innerHTML = rowObject[i].block;
+								td23.appendChild(document.createTextNode(rowObject[i].block.toString()));
+								tr.appendChild(td23);
+
+								var td24 = document.createElement('td');
+								// document.getElementById('Level Number').innerHTML = rowObject[i].level_no;
+								td24.appendChild(document.createTextNode(rowObject[i].level_no.toString()));
+								tr.appendChild(td24);
+
+								var td25 = document.createElement('td');
+								// document.getElementById('Postal Code').innerHTML = rowObject[i].postal_code;
+								td25.appendChild(document.createTextNode(rowObject[i].postal_code.toString()));
+								tr.appendChild(td25);
+
+								console.log(tr);
+								console.log("End else loop");
+
+								console.log("Start retrieval");
+								var str1 = "https://developers.onemap.sg/commonapi/search?searchVal=";
+								// var str2 = rowObject[i].entity_name.toString();
+								var strBlock = rowObject[i].block.toString();
+								var strBlockSpaced = strBlock.concat(" ");
+								var strAddress = rowObject[i].street_name.toString();
+								var str2 = strBlockSpaced.concat(strAddress);
+								console.log("Address: ", str2);
+								var str2Replaced = str2.split(' ').join('%20');
+								var str3 = "&returnGeom=Y&getAddrDetails=Y";
+								var str12 = str1.concat(str2Replaced);
+								var comStr = str12.concat(str3);
+								console.log("String: ", comStr);
+
+								var PC;
+						    $.ajax({
+						        type: "GET",
+						        url: comStr,
+            				async:false,
+						        success: function (response) {
+						            //console.log(response);
+						            PC = response;
+						            // Your next function
+						            PerformTask(PC);
+						        }
+						    });
+
+								function PerformTask(DataResult)
+								{
+								    console.log("Result: ", DataResult);
+										var tdGeo1 = document.createElement('td');
+										tdGeo1.appendChild(document.createTextNode(DataResult.results[0].LATITUDE.toString()));
+										tr.appendChild(tdGeo1);
+
+										var tdGeo2 = document.createElement('td');
+										tdGeo2.appendChild(document.createTextNode(DataResult.results[0].LONGITUDE.toString()));
+										tr.appendChild(tdGeo2);
+
+										var tdBank = document.createElement('td');
+										tdBank.appendChild(document.createTextNode(BankAccGenerator()));
+										tr.appendChild(tdBank);
+
+										datatable.appendChild(tr);
+								}
+
+								// -- //
+								// let url = comStr.toString();
+								// let response = fetch(url);
+								//
+								// let commits = await response.json(); // read response body and parse as JSON
+								// console.log(commits);
+								//
+								// var tdGeo1 = document.createElement('td');
+								// tdGeo1.appendChild(document.createTextNode(commits.results[0].LATITUDE.toString()));
+								// tr.appendChild(tdGeo1);
+								//
+								// var tdGeo2 = document.createElement('td');
+								// tdGeo2.appendChild(document.createTextNode(commits.results[0].LONGITUDE.toString()));
+								// tr.appendChild(tdGeo2);
+								//
+								// datatable.appendChild(tr);
+								// -- //
+
+									// await fetch(comStr.toString())
+									//   .then((response) => {
+									// 		console.log("Response information: ", response);
+									// 		// console.log("Response from JSON: ", response.json());
+									// 		if (response.status == 200){
+									//     	return response.json()
+									// 		}
+									//   })
+									//   .then((data) => {
+									//     // Work with JSON data here
+									//     console.log("What is the DATA: ", data);
+									// 		// if (data == null){
+									// 		// 	tr.appendChild(document.createTextNode("NA"));
+									// 		// 	tr.appendChild(document.createTextNode("NA"));
+									// 		// 	console.log("Empty data");
+									// 		// }	else{
+									// 			// var tr = document.createElement('tr');
+									// 			// var j;
+									// 			// for (j = 0; j == 0 ; j++) {
+									// 				var tdGeo1 = document.createElement('td');
+									// 				// document.getElementById('Latitude').innerHTML = data.results[0].LATITUDE.toString();
+									// 				tdGeo1.appendChild(document.createTextNode(data.results[0].LATITUDE.toString()));
+									// 				tr.appendChild(tdGeo1);
+									//
+									// 				var tdGeo2 = document.createElement('td');
+									// 				// document.getElementById('Longitutde').innerHTML = data.results[0].LONGITUDE.toString();
+									// 				tdGeo2.appendChild(document.createTextNode(data.results[0].LONGITUDE.toString()));
+									// 				tr.appendChild(tdGeo2);
+									// 				console.log("Have data", tr);
+									//
+									// 			// table.appendChild(tr);
+									// 		// }
+									// 			console.log("tr: ", tr);
+									// 			datatable.appendChild(tr);
+									// 			// tr.empty();
+									// 			// tr="";
+									// 			// console.log("tr: ", tr);
+									// 			console.log("End else retireval here");
+									//   })
+									//   .catch((err) => {
+									//     console.log(err);
+									//   })
+							}
+						}
+						document.getElementById("jsonData").innerHTML = JSON.stringify(rowObject, undefined, 4);
+					});
+				}
+			}
+		});
+	</script>
+</html>

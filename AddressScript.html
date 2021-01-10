@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>SAS</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/excellentexport@3.4.3/dist/excellentexport.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<style>
+		table, th, td {
+	  	border: 1px solid black;
+	  	border-collapse: collapse;
+		}
+	</style>
+</head>
+<body>
+	<h2>Address data preparation</h2>
+		<div class="container mt-5">
+			<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-3">
+					<input type="file" id="fileUpload" accept=".xls, .xlsx" /><br/>
+				</div>
+				<div class="col-md-2">
+					<button type="button" id="uploadExcel">Convert</button>
+				</div>
+				<table id="datatable">
+			    <tr>
+			        <td>ID</td>
+							<td>Address</td>
+							<td>Postal Code</td>
+							<td>Latitude</td>
+							<td>Longitude</td>
+			    </tr>
+			<a download="FilteredAddressData.xls" href="#" onclick="return ExcellentExport.excel(this, 'datatable', 'Filtered Address Data');">Export to Excel</a>
+			</table>
+				<div class="col-md-12">
+					<pre id="jsonData"></pre>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		let selectedFile;
+		console.log(window.XLSX);
+		document.getElementById('fileUpload').addEventListener("change", (event) => {
+			selectedFile = event.target.files[0];
+		})
+
+		document.getElementById('uploadExcel').addEventListener("click", () => {
+			if(selectedFile){
+				let fileReader = new FileReader();
+				fileReader.readAsBinaryString(selectedFile);
+				fileReader.onload = (event) => {
+					let data = event.target.result;
+					let workbook = XLSX.read(data, {type:"binary"});
+					console.log(workbook);
+
+					//Changed
+					var i;
+					var datatable = document.getElementById("datatable");
+
+					workbook.SheetNames.forEach(sheet => {
+						let rowObject = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet]);
+						console.log("Row object here: ", rowObject);
+						console.log(rowObject.length);
+
+						for (i = 0; i < rowObject.length; i++) {
+							console.log("Row length: ", rowObject.length);
+							console.log("Row now: ", i);
+
+								var tr = document.createElement('tr');
+
+								var td = document.createElement('td');
+								td.appendChild(document.createTextNode(rowObject[i].employee_id.toString()));
+								tr.appendChild(td);
+
+								var td1 = document.createElement('td');
+								td1.appendChild(document.createTextNode(rowObject[i].address.toString()));
+								tr.appendChild(td1);
+
+								var td2 = document.createElement('td');
+								td2.appendChild(document.createTextNode(rowObject[i].postal_code.toString()));
+								tr.appendChild(td2);
+
+								var str1 = "https://developers.onemap.sg/commonapi/search?searchVal=";
+								// var strBlock = rowObject[i].block.toString();
+								// var strBlockSpaced = strBlock.concat(" ");
+								var strAddress = rowObject[i].postal_code.toString();
+								// var str2 = strBlockSpaced.concat(strAddress);
+								// console.log("Address: ", str2);
+								var str2Replaced = strAddress.split(' ').join('%20');
+								var str3 = "&returnGeom=Y&getAddrDetails=Y";
+								var str12 = str1.concat(str2Replaced);
+								var comStr = str12.concat(str3);
+								console.log("String: ", comStr);
+
+								var PC;
+						    $.ajax({
+						        type: "GET",
+						        url: comStr,
+            				async:false,
+						        success: function (response) {
+						            PC = response;
+						            PerformTask(PC);
+						        }
+						    });
+
+								function PerformTask(DataResult)
+								{
+								    console.log("Result: ", DataResult);
+										var tdGeo1 = document.createElement('td');
+										tdGeo1.appendChild(document.createTextNode(DataResult.results[0].LATITUDE.toString()));
+										tr.appendChild(tdGeo1);
+
+										var tdGeo2 = document.createElement('td');
+										tdGeo2.appendChild(document.createTextNode(DataResult.results[0].LONGITUDE.toString()));
+										tr.appendChild(tdGeo2);
+
+										datatable.appendChild(tr);
+								}
+						}
+						document.getElementById("jsonData").innerHTML = JSON.stringify(rowObject, undefined, 4);
+					});
+				}
+			}
+		});
+	</script>
+</html>
